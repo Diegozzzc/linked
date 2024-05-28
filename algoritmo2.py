@@ -1,49 +1,48 @@
-INF = float('inf')
+import csv
+from datetime import datetime
+import pandas as pd
+import os
 
-def floyd_warshall(graph):
-    n = len(graph)
-    dist = [[0 if i == j else graph[i][j] if graph[i][j] != 0 else INF for j in range(n)] for i in range(n)]
-    next_hop = [[None if i == j or graph[i][j] == 0 else j for j in range(n)] for i in range(n)]
-
-    for k in range(n):
-        for i in range(n):
-            for j in range(n):
-                if dist[i][k] + dist[k][j] < dist[i][j]:
-                    dist[i][j] = dist[i][k] + dist[k][j]
-                    next_hop[i][j] = next_hop[i][k]
-
-    return dist, next_hop
-
-def print_path(start, end, next_hop):
-    path = [start]
-    while next_hop[start][end] is not None:
-        start = next_hop[start][end]
-        path.append(start)
-    return ' -> '.join(map(str, path))
-
-def print_shortest_paths(distances, next_hop):
-    n = len(distances)
-    for i in range(n):
-        for j in range(n):
-            if i != j:
-                print(f"Distancia más corta de {i} a {j}: {distances[i][j]}")
-                print(f"Camino más corto de {i} a {j}: {print_path(i, j, next_hop)}")
-                print()
-
-# Ejemplo de grafo
-graph = [
-    [0, 5, 0, 10, 0],
-    [0, 0, 3, 0, 0],
-    [0, 0, 0, 1, 0],
-    [0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0]
+data_a1 = [
+    ['Nombre', 'Número', 'Fecha'],
+    ['Juan', 123, datetime.now().isoformat()],
+    ['María', 456, datetime.now().isoformat()],
+    ['Pedro', 789, datetime.now().isoformat()]
 ]
 
-distances, next_hop = floyd_warshall(graph)
-print("Matriz de distancias más cortas entre todos los pares de vértices:")
-for row in distances:
-    print(row)
-print()
+data_a2 = [
+    ['Nombre', 'Número', 'Fecha'],
+    ['Laura', 321, datetime.now().isoformat()],
+    ['Carlos', 654, datetime.now().isoformat()],
+    ['Sofía', 987, datetime.now().isoformat()]
+]
 
-print("Camino más corto entre todos los pares de vértices:")
-print_shortest_paths(distances, next_hop)
+data_a3 = [
+    ['Nombre', 'Número', 'Fecha'],
+    ['Ana', 111, datetime.now().isoformat()],
+    ['Diego', 222, datetime.now().isoformat()],
+    ['Elena', 333, datetime.now().isoformat()]
+]
+
+def crear_csv(nombre_archivo, datos):
+    if os.path.exists(nombre_archivo + '.csv'):
+        os.remove(nombre_archivo + '.csv')
+    with open(nombre_archivo + '.csv', 'w', newline='', encoding='utf-8-sig') as file:
+        writer = csv.writer(file)
+        writer.writerows(datos)
+
+crear_csv('A1', data_a1)
+crear_csv('A2', data_a2)
+crear_csv('A3', data_a3)
+
+a1 = pd.read_csv("A1.csv", encoding='utf-8-sig')
+a2 = pd.read_csv("A2.csv", encoding='utf-8-sig')
+a3 = pd.read_csv("A3.csv", encoding='utf-8-sig')
+
+recitales = pd.concat([a1, a2, a3])
+
+recitales.sort_values(by='Nombre', inplace=True)
+
+recitales.to_csv("RECITALES.csv", index=False, encoding='utf-8-sig')
+
+print("Archivo RECITALES.csv creado exitosamente.")
